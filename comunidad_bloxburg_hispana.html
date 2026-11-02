@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad Bloxburg Hispana</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 bg-slate-50 relative min-h-screen overflow-x-hidden">
+
+    <!-- Modal de Alerta Global -->
+    <div id="modal-alert" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-info"></i>
+            </div>
+            <h3 id="modal-title" class="text-lg font-bold text-slate-900 mb-2">Notificación</h3>
+            <p id="modal-msg" class="text-sm text-slate-600 mb-6">Mensaje del sistema</p>
+            <button onclick="closeModal()" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl transition shadow-md shadow-sky-600/20">Entendido</button>
+        </div>
+    </div>
+
+    <!-- NAVBAR OFICIAL -->
+    <header class="bg-white/80 backdrop-blur-md text-slate-800 sticky top-0 z-40 shadow-sm border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-3">
+                <!-- Logo Oficial -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <img src="https://i.postimg.cc/fTx4qKvX/C-B-ES-(11).png" alt="Logo Comunidad Bloxburg Hispana" class="h-12 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/180x50/0284c7/ffffff?text=Bloxburg+Hispana';">
+                </div>
+
+                <!-- Título central web oficial -->
+                <div class="hidden sm:flex flex-col items-center">
+                    <span class="text-xs font-black uppercase tracking-widest text-sky-600">Portal Oficial</span>
+                    <span class="text-sm font-bold text-slate-700">Anuncios de Bloxburg Hispana</span>
+                </div>
+
+                <!-- Área de Acceso Staff -->
+                <div class="flex items-center gap-3" id="nav-user-area">
+                    <button onclick="openAuthModal()" class="py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition shadow cursor-pointer flex items-center gap-2"><i class="fa-solid fa-lock"></i> Acceso Staff</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full space-y-8">
+
+        <!-- Panel de Administración / Publicación (Solo Staff) -->
+        <div id="admin-control-panel" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-indigo-200 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <h2 class="font-black text-slate-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn text-indigo-600"></i> Publicar Anuncio Oficial <span id="owner-badge-text" class="text-[10px] font-bold px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full hidden">Exclusivo Owner</span>
+                </h2>
+                <span class="text-[10px] font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full">Panel Staff</span>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Asistente IA Gemini -->
+                <div class="p-4 bg-indigo-50/60 rounded-2xl border border-indigo-100 space-y-2">
+                    <label class="block text-[10px] font-black text-indigo-700 uppercase tracking-wider"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Asistente IA (Generar con Gemini)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="ai-prompt-input" placeholder="ej. Nueva actualización de navidad con decoraciones y vehículos..." class="flex-1 bg-white border border-indigo-200 rounded-xl p-2.5 text-xs font-semibold">
+                        <button type="button" onclick="generateWithAI()" id="ai-generate-btn" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-1.5"><i class="fa-solid fa-sparkles"></i> Generar</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Título del Anuncio</label>
+                    <input type="text" id="pub-title" placeholder="ej. Anuncio Importante de la Comunidad..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Contenido del Anuncio</label>
+                    <textarea id="pub-content" rows="4" placeholder="Escribe los detalles oficiales del anuncio..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Imagen Destacada (URL)</label>
+                    <input type="text" id="pub-image" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">
+                </div>
+                <button onclick="publishAnnouncement()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane"></i> Publicar Anuncio Oficial</button>
+            </div>
+
+            <!-- Creador de Staff (Solo Owner) -->
+            <div id="staff-creator-box" class="hidden pt-6 border-t border-slate-100 space-y-4">
+                <h3 class="font-bold text-xs text-slate-800 uppercase tracking-wider"><i class="fa-solid fa-users-gear text-amber-500 mr-1"></i> Crear Nuevas Credenciales de Staff</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" id="member-username" placeholder="Usuario..." class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold">
+                    <input type="password" id="member-password" placeholder="Contraseña..." class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold">
+                    <input type="text" id="member-role" placeholder="Cargo (ej: Administrador)" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold">
+                    <input type="text" id="member-icon" placeholder="Icono (fa-shield)" value="fa-shield" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold">
+                </div>
+                <button onclick="registerStaffMember()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow">Registrar Miembro de Staff</button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE ANUNCIOS OFICIALES -->
+        <section class="space-y-6">
+            <div class="text-center space-y-2 py-4">
+                <span class="px-3.5 py-1 bg-sky-50 text-sky-600 text-[10px] font-black uppercase tracking-widest rounded-full">Tablón Oficial</span>
+                <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Anuncios de Bloxburg Hispana</h1>
+                <p class="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">Toda la información oficial, novedades y avisos importantes publicados directamente por el equipo.</p>
+            </div>
+
+            <div id="announcements-container" class="space-y-6">
+                <div class="bg-white p-12 text-center rounded-3xl text-slate-400 shadow-sm border border-slate-200"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-sky-600"></i></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER OFICIAL -->
+    <footer class="bg-white border-t border-slate-200 py-8 mt-16 text-center text-xs text-slate-400">
+        <p>© Comunidad Bloxburg Hispana. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- MODAL AUTH -->
+    <div id="modal-auth" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="text-center space-y-1">
+                <h3 class="font-black text-xl text-slate-900">Acceso de Staff</h3>
+                <p class="text-xs text-slate-500">Introduce tus credenciales autorizadas</p>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Usuario</label>
+                    <input type="text" id="auth-username" placeholder="Tu usuario" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Contraseña</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-semibold">
+                </div>
+            </div>
+            <button onclick="handleLogin()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition shadow">Iniciar Sesión</button>
+            <button onclick="closeAuthModal()" class="w-full text-center text-xs text-slate-400 hover:text-slate-600 pt-1">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bloxburg-hispana-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo", authDomain: "demo.firebaseapp.com", projectId: "demo", storageBucket: "demo.appspot.com", messagingSenderId: "123", appId: "1:123:web:demo"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const STAFF_COL = collection(db, 'artifacts', appId, 'public', 'data', 'staff_users');
+        const ANNOUNCEMENTS_COL = collection(db, 'artifacts', appId, 'public', 'data', 'official_announcements');
+
+        let deviceId = localStorage.getItem('blox_device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substring(2) + Date.now();
+            localStorage.setItem('blox_device_id', deviceId);
+        }
+
+        window.currentUser = JSON.parse(localStorage.getItem('blox_user') || 'null');
+        window.dbStaff = [];
+        window.dbAnnouncements = [];
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch(e) { console.error(e); }
+            setupListeners();
+        }
+
+        window.showAlert = function(title, msg) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('modal-alert').classList.remove('hidden');
+        };
+        window.closeModal = () => document.getElementById('modal-alert').classList.add('hidden');
+
+        window.openAuthModal = () => document.getElementById('modal-auth').classList.remove('hidden');
+        window.closeAuthModal = () => document.getElementById('modal-auth').classList.add('hidden');
+
+        window.generateWithAI = async function() {
+            const promptVal = document.getElementById('ai-prompt-input').value.trim();
+            if (!promptVal) {
+                window.showAlert('Aviso IA', 'Por favor escribe una breve idea para que la IA genere el título y la descripción.');
+                return;
+            }
+
+            const btn = document.getElementById('ai-generate-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
+
+            try {
+                const systemPrompt = "Eres un redactor oficial para una comunidad de Roblox Bloxburg. A partir de una idea breve, genera un JSON estricto con dos claves: 'title' (un título de anuncio oficial llamativo y profesional) y 'content' (una descripción atractiva, detallada y bien redactada para la publicación oficial).";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ role: 'user', parts: [{ text: `Idea: ${promptVal}` }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING" },
+                                "content": { "type": "STRING" }
+                            },
+                            propertyOrdering: ["title", "content"]
+                        }
+                    },
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const parsed = JSON.parse(candidate.content.parts[0].text);
+                    document.getElementById('pub-title').value = parsed.title || '';
+                    document.getElementById('pub-content').value = parsed.content || '';
+                    window.showAlert('IA Generada', '¡Título y descripción generados con éxito!');
+                } else {
+                    window.showAlert('Error IA', 'No se pudo generar el contenido. Inténtalo de nuevo.');
+                }
+            } catch(e) {
+                console.error(e);
+                window.showAlert('Error IA', 'Ocurrió un error al conectar con Gemini.');
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-sparkles"></i> Generar';
+                btn.disabled = false;
+            }
+        };
+
+        window.handleLogin = function() {
+            const u = document.getElementById('auth-username').value.trim();
+            const p = document.getElementById('auth-password').value.trim();
+            
+            const found = (window.dbStaff || []).find(s => s.username.toLowerCase() === u.toLowerCase());
+            if (u.toLowerCase() === 'mrleonport' || (found && found.password === p)) {
+                const userData = u.toLowerCase() === 'mrleonport' ? { username: 'mrleonport', role: 'Owner Supremo', icon: 'fa-crown' } : found;
+                window.currentUser = userData;
+                localStorage.setItem('blox_user', JSON.stringify(userData));
+                window.closeAuthModal();
+                window.updateNavUserArea();
+                window.showAlert('Sesión Iniciada', `¡Bienvenido al panel, ${userData.username}!`);
+            } else {
+                window.showAlert('Acceso Denegado', 'Usuario o contraseña incorrectos.');
+            }
+        };
+
+        window.logout = function() {
+            localStorage.removeItem('blox_user');
+            window.currentUser = null;
+            window.updateNavUserArea();
+        };
+
+        window.updateNavUserArea = function() {
+            const area = document.getElementById('nav-user-area');
+            const adminPanel = document.getElementById('admin-control-panel');
+            const staffCreatorBox = document.getElementById('staff-creator-box');
+            const ownerBadgeText = document.getElementById('owner-badge-text');
+
+            const isStaff = window.currentUser && (window.currentUser.username.toLowerCase() === 'mrleonport' || window.currentUser.role);
+            const isOwner = window.currentUser && window.currentUser.username.toLowerCase() === 'mrleonport';
+
+            if (isStaff) {
+                adminPanel.classList.remove('hidden');
+                if (isOwner) {
+                    staffCreatorBox.classList.remove('hidden');
+                    ownerBadgeText.classList.remove('hidden');
+                } else {
+                    staffCreatorBox.classList.add('hidden');
+                    ownerBadgeText.classList.add('hidden');
+                }
+
+                area.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5 bg-slate-100 px-3 py-2 rounded-xl"><i class="fa-solid ${window.currentUser.icon || 'fa-shield'} text-amber-500"></i>${window.currentUser.username}</span>
+                        <button onclick="logout()" class="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition text-xs" title="Cerrar Sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    </div>
+                `;
+            } else {
+                adminPanel.classList.add('hidden');
+                area.innerHTML = `<button onclick="openAuthModal()" class="py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition shadow cursor-pointer flex items-center gap-2"><i class="fa-solid fa-lock"></i> Acceso Staff</button>`;
+            }
+        };
+
+        window.registerStaffMember = async function() {
+            if (!window.currentUser || window.currentUser.username.toLowerCase() !== 'mrleonport') {
+                window.showAlert('Acción Denegada', 'Solo el Owner (mrleonport) puede crear cuentas de staff.');
+                return;
+            }
+            const username = document.getElementById('member-username').value.trim();
+            const password = document.getElementById('member-password').value.trim();
+            const role = document.getElementById('member-role').value.trim();
+            const icon = document.getElementById('member-icon').value.trim() || 'fa-shield';
+            if (!username || !password || !role) return;
+
+            const member = { username, password, role, icon };
+            await setDoc(doc(STAFF_COL, username.toLowerCase()), member);
+            document.getElementById('member-username').value = '';
+            document.getElementById('member-password').value = '';
+            document.getElementById('member-role').value = '';
+            window.showAlert('Staff Registrado', `Se ha creado la cuenta para ${username} con éxito.`);
+        };
+
+        window.publishAnnouncement = async function() {
+            if (!window.currentUser) {
+                window.showAlert('Acceso Restringido', 'Debes iniciar sesión como staff para publicar anuncios.');
+                return;
+            }
+            const title = document.getElementById('pub-title').value.trim();
+            const content = document.getElementById('pub-content').value.trim();
+            const image = document.getElementById('pub-image').value.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80';
+
+            if (!title || !content) return;
+
+            const post = {
+                id: Date.now().toString(),
+                title,
+                content,
+                image,
+                author: window.currentUser.username,
+                timestamp: Date.now(),
+                reactions: {}
+            };
+
+            await setDoc(doc(ANNOUNCEMENTS_COL, post.id), post);
+            document.getElementById('pub-title').value = '';
+            document.getElementById('pub-content').value = '';
+            document.getElementById('pub-image').value = '';
+            document.getElementById('ai-prompt-input').value = '';
+            window.showAlert('Publicado', 'El anuncio oficial se ha publicado correctamente.');
+        };
+
+        window.deleteAnnouncement = async function(postId) {
+            if (!window.currentUser || window.currentUser.username.toLowerCase() !== 'mrleonport') {
+                window.showAlert('Acceso Denegado', 'Solo el Owner puede eliminar anuncios.');
+                return;
+            }
+            try {
+                await deleteDoc(doc(ANNOUNCEMENTS_COL, postId));
+                window.showAlert('Eliminado', 'El anuncio ha sido eliminado con éxito.');
+            } catch(e) {
+                console.error(e);
+                window.showAlert('Error', 'No se pudo eliminar el elemento.');
+            }
+        };
+
+        window.reactToPost = async function(postId, emojiType) {
+            const post = window.dbAnnouncements.find(p => p.id === postId);
+            if (!post) return;
+
+            let reactions = post.reactions || {};
+            if (reactions[deviceId] === emojiType) {
+                delete reactions[deviceId];
+            } else {
+                reactions[deviceId] = emojiType;
+            }
+
+            await updateDoc(doc(ANNOUNCEMENTS_COL, postId), { reactions });
+        };
+
+        window.renderAnnouncements = function() {
+            const container = document.getElementById('announcements-container');
+            const posts = window.dbAnnouncements;
+
+            if (!posts.length) {
+                container.innerHTML = `<div class="bg-white p-12 text-center rounded-3xl text-slate-400 text-xs shadow-sm border border-slate-200">No hay anuncios oficiales publicados por el momento.</div>`;
+                return;
+            }
+
+            container.innerHTML = posts.map(p => {
+                const reactions = p.reactions || {};
+                let counts = { '👍': 0, '❤️': 0, '🔥': 0, '⭐': 0 };
+                let userReaction = reactions[deviceId];
+
+                Object.values(reactions).forEach(r => {
+                    if (counts[r] !== undefined) counts[r]++;
+                });
+
+                const dateStr = new Date(p.timestamp).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                return `
+                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 relative transition hover:shadow-md">
+                        ${window.currentUser && window.currentUser.username.toLowerCase() === 'mrleonport' ? `<button onclick="deleteAnnouncement('${p.id}')" class="absolute top-4 right-4 z-10 p-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-lg transition" title="Eliminar anuncio"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <img src="${p.image}" class="w-full h-auto max-h-[450px] object-cover" onerror="this.onerror=null; this.src='https://placehold.co/800x400/0284c7/ffffff?text=Bloxburg+Hispana';">
+                        <div class="p-6 sm:p-8 space-y-4">
+                            <div class="flex items-center justify-between text-xs text-slate-400">
+                                <span class="font-bold text-sky-600 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Anuncio Oficial</span>
+                                <span>Publicado por <strong class="text-slate-700">${p.author || 'Staff'}</strong> el ${dateStr}</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">${p.title}</h2>
+                            <p class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">${p.content}</p>
+                            
+                            <div class="flex items-center gap-2 pt-4 border-t border-slate-100 mt-4">
+                                <span class="text-xs font-bold text-slate-400 mr-2">Reaccionar:</span>
+                                <button onclick="reactToPost('${p.id}', '👍')" class="px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 ${userReaction === '👍' ? 'bg-sky-600 text-white font-bold shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">👍 <span>${counts['👍']}</span></button>
+                                <button onclick="reactToPost('${p.id}', '❤️')" class="px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 ${userReaction === '❤️' ? 'bg-rose-600 text-white font-bold shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">❤️ <span>${counts['❤️']}</span></button>
+                                <button onclick="reactToPost('${p.id}', '🔥')" class="px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 ${userReaction === '🔥' ? 'bg-amber-600 text-white font-bold shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">🔥 <span>${counts['🔥']}</span></button>
+                                <button onclick="reactToPost('${p.id}', '⭐')" class="px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 ${userReaction === '⭐' ? 'bg-indigo-600 text-white font-bold shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">⭐ <span>${counts['⭐']}</span></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        function setupListeners() {
+            onSnapshot(STAFF_COL, (snap) => {
+                window.dbStaff = [];
+                snap.forEach(d => window.dbStaff.push(d.data()));
+            }, (err) => console.error(err));
+
+            onSnapshot(ANNOUNCEMENTS_COL, (snap) => {
+                window.dbAnnouncements = [];
+                snap.forEach(d => window.dbAnnouncements.push({ id: d.id, ...d.data() }));
+                window.dbAnnouncements.sort((a,b) => b.timestamp - a.timestamp);
+                window.renderAnnouncements();
+            }, (err) => console.error(err));
+        }
+
+        window.onload = function() {
+            initAuth();
+            window.updateNavUserArea();
+        };
+    </script>
+</body>
+</html>
